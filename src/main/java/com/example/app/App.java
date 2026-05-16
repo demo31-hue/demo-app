@@ -1,26 +1,41 @@
 package com.example.app;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang3.StringUtils;
+import java.util.UUID;
 
 public class App {
-
     private static final Logger logger = LoggerFactory.getLogger(App.class);
 
-    public static void main(String[] args) {
-        String name = "CI/CD Pipeline";
+    public static class Order {
+        private String orderId = UUID.randomUUID().toString().substring(0, 8);
+        private double orderTotal;
+        private String shippingCountry;
+        private int itemQuantity;
 
-        if (StringUtils.isNotBlank(name)) {
-            String message = greet(name);
-            logger.info(message);
-            System.out.println(message);
-        } else {
-            logger.error("Name is empty!");
+        public Order(double orderTotal, String shippingCountry, int itemQuantity) {
+            this.orderTotal = orderTotal;
+            this.shippingCountry = shippingCountry;
+            this.itemQuantity = itemQuantity;
         }
+        public String getOrderId() { return orderId; }
+        public double getOrderTotal() { return orderTotal; }
+        public String getShippingCountry() { return shippingCountry; }
+        public int getItemQuantity() { return itemQuantity; }
     }
 
-    public static String greet(String name) {
-        return "Hello, " + name + "! Welcome to Maven CI/CD Demo.";
+    public boolean processOrder(Order order) {
+        logger.info("Processing Order ID: #{}", order.getOrderId());
+        if (order.getOrderTotal() > 5000.0 || order.getItemQuantity() > 50 || "SanctionedRegion".equalsIgnoreCase(order.getShippingCountry())) {
+            logger.warn("ALERT [FRAUD/RISK]: Order #{} rejected.", order.getOrderId());
+            return false;
+        }
+        logger.info("SUCCESS: Order #{} passed security rules.", order.getOrderId());
+        return true;
+    }
+
+    public static void main(String[] args) {
+        App engine = new App();
+        engine.processOrder(new Order(250.00, "IN", 3));
+        engine.processOrder(new Order(9999.00, "US", 1));
     }
 }
