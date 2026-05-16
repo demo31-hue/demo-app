@@ -7,13 +7,6 @@ pipeline {
     }
 
     stages {
-
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/demo31-hue/demo-app.git'
-            }
-        }
-
         stage('Build') {
             steps {
                 sh 'mvn clean compile'
